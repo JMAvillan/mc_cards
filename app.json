@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "marvel_champions",
-    "slug": "marvel_champions",
+    "name": "Marvel Champions",
+    "slug": "marvel-champions",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
