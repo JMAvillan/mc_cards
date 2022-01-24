@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import FastImage from "react-native-fast-image";
+import RenderHTML from "react-native-render-html";
 import { connect } from "react-redux";
 import { fetchAllCards, fetchAllCardsReset } from "../../../actions/cards";
 import { fetchDeckList } from "../../../actions/decks";
@@ -18,7 +19,7 @@ import { fetchAllPacks } from "../../../actions/packs";
 import { SCREEN } from "../../../constants";
 import ICard from "../../../interfaces/ICard";
 import IDeck from "../../../interfaces/IDeck";
-// import CachedImage from "expo-cached-image";
+import HTMLView from "react-native-htmlview";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -64,10 +65,12 @@ const renderCardPreview = ({ item }: any) => {
 const CardPreview = (props: any) => {
   const card: ICard = props.card;
   const linkedCard = card.linked_card;
+
+  if (!card.imagesrc) {
+    console.log(card);
+  }
   return (
     <View style={styles.cardPreviewContainer}>
-      {/* <Text>{deck?.name}</Text> */}
-      {/* <Text> */}
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: "Nunito", fontSize: 16 }}>
           <Text>
@@ -76,39 +79,48 @@ const CardPreview = (props: any) => {
           </Text>
           {linkedCard && <Text> - {card.linked_card.name}</Text>}
         </Text>
-        {/* <Text>{card.type_name}</Text> */}
+
         <Text style={{ fontFamily: "Nunito-BlackItalic", textAlign: "center" }}>
           {card.traits}
         </Text>
-        {/* <Text>{card.pack_name}</Text> */}
-        <Text style={{ fontFamily: "Nunito-SemiBoldItalic" }} numberOfLines={2}>
-          {card.flavor}
-        </Text>
+
+        {card.flavor ? (
+          <Text style={{ fontFamily: "Nunito-Italic" }} numberOfLines={2}>
+            {card.flavor}
+          </Text>
+        ) : (
+          <HTMLView
+            value={`<div>${card.text}</div>`}
+            addLineBreaks={false}
+            nodeComponentProps={{ numberOfLines: 2 }}
+            stylesheet={{
+              div: {
+                fontFamily: "Nunito-Regular",
+              },
+              b: {
+                fontFamily: "Nunito-Bold",
+              },
+              i: {
+                fontFamily: "Nunito-Italic",
+              },
+            }}
+          />
+        )}
       </View>
-      {/* </Text> */}
       {/* <Text style={{ textTransform: "capitalize" }}>{card?.meta.aspect}</Text>
       <Text>Published on: {card?.date_creation}</Text>
       <Text>Updated on: {card?.date_update}</Text> */}
       <FastImage
-        style={{ width: "15%" }}
+        style={{ width: "15%", marginLeft: 8 }}
         source={{
-          uri: `https://marvelcdb.com${card.imagesrc}`,
+          uri:
+            `https://marvelcdb.com${card.imagesrc}` ||
+            `https://marvelcdb.com/bundles/cards/${card.code}.png`,
           headers: { Authorization: "someAuthToken" },
           priority: FastImage.priority.normal,
         }}
         resizeMode={FastImage.resizeMode.contain}
       />
-      {/* <Image
-        source={{
-          uri: `https://marvelcdb.com${card.imagesrc}`,
-          cache: "force-cache",
-        }}
-        resizeMethod="auto"
-        resizeMode="contain"
-        style={{ width: "15%" }}
-        height={0}
-        width={0}
-      /> */}
     </View>
   );
 };
@@ -202,7 +214,6 @@ const styles = StyleSheet.create({
     //Fit
     width: SCREEN.WIDTH,
     height: 95,
-    // marginHorizontal: 8,
     marginVertical: 1,
     padding: 8,
 
