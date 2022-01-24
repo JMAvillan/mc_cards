@@ -1,4 +1,4 @@
-package com.mc.deckbuilder;
+package com.avillan.mc_cards;
 
 import android.os.Build;
 import android.os.Bundle;

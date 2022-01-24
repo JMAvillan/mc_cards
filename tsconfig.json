@@ -15,6 +15,5 @@
     "strictNullChecks": true,
     "noImplicitThis": true,
     "esModuleInterop": true
-  },
-  "extends": "expo/tsconfig.base"
+  }
 }

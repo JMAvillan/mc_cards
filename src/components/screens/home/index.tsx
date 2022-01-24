@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import FastImage from "react-native-fast-image";
 import { connect } from "react-redux";
 import { fetchAllCards, fetchAllCardsReset } from "../../../actions/cards";
 import { fetchDeckList } from "../../../actions/decks";
@@ -88,7 +89,16 @@ const CardPreview = (props: any) => {
       {/* <Text style={{ textTransform: "capitalize" }}>{card?.meta.aspect}</Text>
       <Text>Published on: {card?.date_creation}</Text>
       <Text>Updated on: {card?.date_update}</Text> */}
-      <Image
+      <FastImage
+        style={{ width: "15%" }}
+        source={{
+          uri: `https://marvelcdb.com${card.imagesrc}`,
+          headers: { Authorization: "someAuthToken" },
+          priority: FastImage.priority.normal,
+        }}
+        resizeMode={FastImage.resizeMode.contain}
+      />
+      {/* <Image
         source={{
           uri: `https://marvelcdb.com${card.imagesrc}`,
           cache: "force-cache",
@@ -98,14 +108,6 @@ const CardPreview = (props: any) => {
         style={{ width: "15%" }}
         height={0}
         width={0}
-      />
-      {/* <CachedImage
-        source={{
-          uri: `https://marvelcdb.com${card.imagesrc}`,
-        }}
-        cacheKey={`${card.code}-thumb`}
-        resizeMode="contain"
-        style={{ width: "15%" }}
       /> */}
     </View>
   );
