@@ -20,6 +20,7 @@ import { SCREEN } from "../../../constants";
 import ICard from "../../../interfaces/ICard";
 import IDeck from "../../../interfaces/IDeck";
 import HTMLView from "react-native-htmlview";
+import Accordion from "react-native-collapsible/Accordion";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -38,22 +39,20 @@ const DeckPreview = (props: any) => {
       <Text style={{ textTransform: "capitalize" }}>{deck?.meta.aspect}</Text>
       <Text>Published on: {deck?.date_creation}</Text>
       <Text>Updated on: {deck?.date_update}</Text>
-      {/* <Image src={require(deck.)}/> */}
     </View>
   );
 };
 
-//({ item }) => renderCardPreview(item)
+//For SectionList
 const renderCardPreview = ({ item }: any) => {
   const card: ICard = item;
-  // console.log("This is the card name ->", card.name);
   const linkedCard = card.linked_card;
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       decelerationRate={"fast"}
-      snapToInterval={SCREEN.WIDTH} //your element width
+      snapToInterval={SCREEN.WIDTH}
       snapToAlignment={"center"}
     >
       <CardPreview card={card} />
@@ -62,23 +61,34 @@ const renderCardPreview = ({ item }: any) => {
   );
 };
 
+//For Accordion + Flatlist
+const renderCardSectionList = ({ data: cardList }: any) => {
+  return (
+    <FlatList
+      data={cardList}
+      keyExtractor={({ code }) => code}
+      renderItem={renderCardPreview}
+    />
+  );
+};
+
 const CardPreview = (props: any) => {
   const card: ICard = props.card;
-  const linkedCard = card.linked_card;
-
-  if (!card.imagesrc) {
-    console.log(card);
-  }
   return (
     <View style={styles.cardPreviewContainer}>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: "Nunito", fontSize: 16 }}>
-          <Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={{ fontFamily: "Nunito", fontSize: 16 }}>
             {card.is_unique ? "⟡ " : ""}
             {card.name}
           </Text>
-          {linkedCard && <Text> - {card.linked_card.name}</Text>}
-        </Text>
+          {card.type_code === "alter_ego" && (
+            <Text style={{ fontFamily: "Nunito-Regular" }}>
+              {" "}
+              - {card.type_name}
+            </Text>
+          )}
+        </View>
 
         <Text style={{ fontFamily: "Nunito-BlackItalic", textAlign: "center" }}>
           {card.traits}
@@ -88,7 +98,7 @@ const CardPreview = (props: any) => {
           <Text style={{ fontFamily: "Nunito-Italic" }} numberOfLines={2}>
             {card.flavor}
           </Text>
-        ) : (
+        ) : card.text ? (
           <HTMLView
             value={`<div>${card.text}</div>`}
             addLineBreaks={false}
@@ -105,6 +115,10 @@ const CardPreview = (props: any) => {
               },
             }}
           />
+        ) : (
+          <Text style={{ fontFamily: "Nunito-Regular" }} numberOfLines={2}>
+            {"Not Available Yet"}
+          </Text>
         )}
       </View>
       {/* <Text style={{ textTransform: "capitalize" }}>{card?.meta.aspect}</Text>
@@ -133,25 +147,50 @@ const Home = (props: any) => {
     // props.fetchAllPacks();
   }, []);
 
+  props.navigation.setOptions({
+    headerRight: () => {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate("Filters");
+          }}
+        >
+          <Text>Filter</Text>
+        </TouchableOpacity>
+      );
+    },
+  });
+
   const { decks, cards, packs } = props;
   const [sections, setSections] = useState(null);
   const [data, setData] = useState([]);
 
+  //Used with accordion
+  const [activeSections, setActiveSections] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (cards.filteredCards) {
+      const sections: any = {};
+      cards.filteredCards.forEach((card: ICard) => {
+        if (sections[card.type_code]) {
+          sections[card.type_code].data.push(card);
+        } else {
+          if (card.type_code !== "alter_ego")
+            sections[card.type_code] = {
+              title: card.type_name,
+              data: [card],
+            };
+        }
+      });
+      const data: any = Object.values(sections);
+      setSections(sections);
+      setData(data);
+      // setActiveSections(data.map((list: any, index: number) => index));
+    }
+  }, [cards.filteredCards]);
+
   if (props.cards.cardListFetchSuccess && !sections) {
     console.log("Card Success ->", props.cards.cardListFetchSuccess);
-    const sections: any = {};
-    cards.cards.forEach((card: ICard) => {
-      if (sections[card.type_code]) {
-        sections[card.type_code].data.push(card);
-      } else {
-        sections[card.type_code] = {
-          title: card.type_name,
-          data: [card],
-        };
-      }
-    });
-    setSections(sections);
-    setData(Object.values(sections));
     props.fetchAllCardsReset();
   }
 
@@ -169,6 +208,37 @@ const Home = (props: any) => {
   return (
     <>
       {data.length > 0 && (
+        //Sectioned List With Collapsable sections
+        // <Accordion
+        //   sections={data}
+        //   activeSections={activeSections}
+        //   renderContent={renderCardSectionList}
+        //   renderAsFlatList={true}
+        //   expandMultiple={true}
+        //   renderHeader={(section) => {
+        //     return (
+        //       <View
+        //         style={{
+        //           paddingBottom: 0,
+        //           // paddingTop: 8,
+        //           backgroundColor: "gray",
+        //         }}
+        //       >
+        //         <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
+        //           {section.title}
+        //         </Text>
+        //       </View>
+        //     );
+        //   }}
+        //   renderSectionTitle={(section) => {
+        //     return <View />;
+        //   }}
+        //   onChange={(indexes) => {
+        //     setActiveSections(indexes);
+        //   }}
+        // />
+
+        //Sectioned List with Sticky Header
         <SectionList
           sections={data}
           // data={cards.cards}
@@ -179,17 +249,22 @@ const Home = (props: any) => {
           stickySectionHeadersEnabled={true}
           keyExtractor={({ code }) => code}
           renderItem={renderCardPreview}
-          renderSectionHeader={({ section: { title } }) => {
+          renderSectionHeader={({ section: { title, data } }: any) => {
             return (
               <View
                 style={{
                   paddingBottom: 0,
                   // paddingTop: 8,
                   backgroundColor: "gray",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
                 <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
-                  {title}
+                  {`${title}`}
+                </Text>
+                <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
+                  {`${data && data.length} Cards`}
                 </Text>
               </View>
             );
@@ -197,15 +272,6 @@ const Home = (props: any) => {
         />
       )}
     </>
-    // <TouchableOpacity
-    //   onPress={() => {
-    //     console.log("Button pressed", new Date().getTime());
-    //     props.fetchDeckList(new Date().getTime());
-    //   }}
-    // >
-    //   <Text> This is my home! </Text>
-    //   {/* <Text> {props.deckList.deckList.toString()} </Text> */}
-    // </TouchableOpacity>
   );
 };
 

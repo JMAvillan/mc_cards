@@ -1,4 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
+import { Text, View } from "react-native";
+import Filters from "../screens/Filters";
 import Home from "../screens/home";
 
 const HomeStack = createStackNavigator();
@@ -6,7 +8,18 @@ const HomeStack = createStackNavigator();
 const HomeStackScreen = () => {
   return (
     <HomeStack.Navigator>
-      <HomeStack.Screen name="Home" component={Home} />
+      <HomeStack.Screen name="Home" component={Home} options={{}} />
+      <HomeStack.Screen
+        name="Filters"
+        component={Filters}
+        options={
+          {
+            // presentation: "transparentModal",
+            // headerShown: false,
+            // cardOverlayEnabled: true,
+          }
+        }
+      />
       {/* <HomeStack.Screen name="Notifications" component={Notifications} />
       <HomeStack.Screen name="Profile" component={Profile} />
       <HomeStack.Screen name="Settings" component={Settings} /> */}

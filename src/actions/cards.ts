@@ -20,10 +20,15 @@ const fetchAllCardsReset = () => ({
   type: CARDS.REQUEST_ALL_CARDS_RESET,
   payload: {},
 });
+const filterCards = (filterCode: string, valueCode: string) => ({
+  type: CARDS.FILTER_CARDS,
+  payload: { filterCode, valueCode },
+});
 
 export {
   fetchAllCards,
   fetchAllCardsSuccess,
   fetchAllCardsFailure,
   fetchAllCardsReset,
+  filterCards,
 };
