@@ -6,72 +6,69 @@ import { connect } from "react-redux";
 import { filterCards } from "../../../actions/cards";
 import { SCREEN } from "../../../constants";
 import ICard from "../../../interfaces/ICard";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useTheme } from "@react-navigation/native";
+import Accordion from "react-native-collapsible/Accordion";
 
-const FilterOption = ({
-  title,
-  data,
-  onPress,
-  collapsed,
-  onFilterValueChange,
-}: any) => {
+const FilterOption = ({ data, onFilterValueChange }: any) => {
+  const { colors } = useTheme();
   return (
-    <View>
-      <TouchableOpacity onPress={onPress}>
-        <Text>{title}</Text>
-      </TouchableOpacity>
-      <Collapsible collapsed={collapsed}>
-        {/**Any child interaction causes the collsible container to collapse*/}
-        {/*Fix: Need to wrap child components inside scrollview -> https://github.com/oblador/react-native-collapsible/issues/72#issuecomment-292515685 */}
-        <ScrollView>
+    <FlatList
+      data={data}
+      contentContainerStyle={{ backgroundColor: colors.card, height: "100%" }}
+      keyExtractor={({ code }) => code}
+      numColumns={2}
+      renderItem={({ item }: any) => {
+        return (
           <View
             style={{
-              flex: 1,
               flexDirection: "row",
-              flexWrap: "wrap",
+              alignItems: "center",
+              margin: 2,
               paddingHorizontal: 8,
-              // justifyContent: "center",
+              width: "48.9%",
+              height: 40,
+              borderWidth: 1,
+              borderRadius: 8,
+              borderColor: colors.border,
+              // borderColor: "red",
             }}
           >
-            {data.map((item: any) => {
-              return (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: "32%",
-                    height: 40,
-                    borderWidth: 1,
-                    borderColor: "red",
-                    margin: 2,
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      onFilterValueChange(item.code);
-                    }}
-                    style={{
-                      borderWidth: 1,
-                      width: "100%",
-                      height: "100%",
-                      justifyContent: "center",
-                      zIndex: 2,
-                    }}
-                  >
-                    {item.selected ? <Text>O</Text> : <Text>X</Text>}
-                  </TouchableOpacity>
-                  <Text
-                    style={{ marginLeft: "-90%", width: "100%" }}
-                    numberOfLines={2}
-                  >
-                    {item.name}
-                  </Text>
-                </View>
-              );
-            })}
+            <BouncyCheckbox
+              size={15}
+              isChecked={item.selected}
+              fillColor={colors.primary}
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: colors.primary }}
+              style={{
+                // borderWidth: 1,
+                width: "100%",
+                height: "100%",
+                zIndex: 2,
+              }}
+              onPress={() => {
+                onFilterValueChange(item.code);
+              }}
+              bounceFriction={10}
+              disableText={true}
+              disableBuiltInState={true}
+            />
+            <Text
+              style={{
+                marginLeft: "-85%",
+                width: "100%",
+                fontFamily: "Nunito-Regular",
+                color: colors.text,
+                flex: 1,
+              }}
+              numberOfLines={2}
+            >
+              {item.name}
+            </Text>
           </View>
-        </ScrollView>
-      </Collapsible>
-    </View>
+        );
+      }}
+    />
   );
 };
 
@@ -97,80 +94,67 @@ const Filters = (props: any) => {
       );
     },
   });
-  const [collapsedContainers, setCollapsedContainers] = useState<any>({
-    // sets: false,
-    packs: true,
-    types: true,
-    factions: true,
-    traits: true,
-  });
-
-  const onFilterOptionPressed = (sectionCode: string) => {
-    setCollapsedContainers({
-      ...collapsedContainers,
-      [sectionCode]: !collapsedContainers[sectionCode],
-    });
-  };
+  const [activeSections, setActiveSections] = useState<number[]>([]);
+  const sections = [
+    { title: "Packs", data: Object.values(props.cards.packs), key: "packs" },
+    {
+      title: "Card Types",
+      data: Object.values(props.cards.types),
+      key: "types",
+    },
+    {
+      title: "Class",
+      data: Object.values(props.cards.factions),
+      key: "factions",
+    },
+    { title: "Traits", data: Object.values(props.cards.traits), key: "traits" },
+    // { title: "Sets", data: Object.values(props.cards.sets), key: "sets" },
+  ];
 
   return (
-    <ScrollView nestedScrollEnabled={false}>
-      {/* <FilterOption
-        title={"Sets"}
-        data={Object.values(props.cards.sets)}
-        key={"sets"}
-        onPress={() => {
-          onFilterOptionPressed("sets");
+    <View>
+      <Accordion
+        sections={sections}
+        activeSections={activeSections}
+        touchableComponent={TouchableOpacity}
+        containerStyle={{ height: "100%" }}
+        renderContent={({ data, key }: any) => {
+          return (
+            <FilterOption
+              data={data}
+              key={key}
+              onFilterValueChange={(valueCode: string) => {
+                props.filterCards(key, valueCode);
+              }}
+            />
+          );
         }}
-        collapsed={!collapsedContainers.sets}
-      /> */}
-      <FilterOption
-        title={"Packs"}
-        data={Object.values(props.cards.packs)}
-        key={"packs"}
-        collapsed={collapsedContainers.packs}
-        onPress={() => {
-          onFilterOptionPressed("packs");
+        renderAsFlatList={true}
+        expandMultiple={true}
+        renderHeader={(section) => {
+          return (
+            <View
+              style={[
+                {
+                  borderWidth: 1,
+                  width: "23%",
+                  padding: 8,
+                  borderRadius: 8,
+                },
+              ]}
+            >
+              <Text>{section.title}</Text>
+            </View>
+          );
         }}
-        onFilterValueChange={(valueCode: string) => {
-          props.filterCards("packs", valueCode);
+        renderSectionTitle={(section) => {
+          return <View />;
         }}
-      />
-      <FilterOption
-        title={"Card Types"}
-        data={Object.values(props.cards.types)}
-        key={"types"}
-        onPress={() => {
-          onFilterOptionPressed("types");
-        }}
-        collapsed={collapsedContainers.types}
-        onFilterValueChange={(valueCode: string) => {
-          props.filterCards("types", valueCode);
-        }}
-      />
-      <FilterOption
-        title={"Class"}
-        data={Object.values(props.cards.factions)}
-        key={"factions"}
-        onPress={() => {
-          onFilterOptionPressed("factions");
-        }}
-        collapsed={collapsedContainers.factions}
-        onFilterValueChange={(valueCode: string) => {
-          props.filterCards("factions", valueCode);
+        onChange={(indexes) => {
+          setActiveSections(indexes);
         }}
       />
-      <FilterOption
-        title={"Traits"}
-        data={Object.values(props.cards.traits)}
-        key={"traits"}
-        onPress={() => {
-          onFilterOptionPressed("traits");
-        }}
-        collapsed={collapsedContainers.traits}
-        onFilterValueChange={(valueCode: string) => {
-          props.filterCards("traits", valueCode);
-        }}
-      />
+
       {/* <Text>{`Filter by card_set_code: ${card?.card_set_code}`}</Text>
       <Text>{`Filter by faction_code: ${card?.faction_code}`}</Text>
       <Text>{`Filter by health: ${card?.health}`}</Text>
@@ -178,7 +162,7 @@ const Filters = (props: any) => {
       <Text>{`Filter by quantity: ${card?.quantity}`}</Text>
       <Text>{`Filter by recover: ${card?.recover}`}</Text>
       <Text>{`Filter by position: ${card?.position}`}</Text> */}
-    </ScrollView>
+    </View>
   );
 };
 

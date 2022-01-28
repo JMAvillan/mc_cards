@@ -1,15 +1,38 @@
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import configureStore from "./src/store";
 import { Provider } from "react-redux";
 import { HomeStackScreen } from "./src/components/navigation/router";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  DefaultTheme,
+  DarkTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
 
+const lightTheme = {
+  dark: false,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: "#E89221",
+    // background: "#EBE9EC",
+    notification: "rgb(255, 69, 58)",
+  },
+};
+const darkTheme = {
+  dark: true,
+  colors: {
+    ...DarkTheme.colors,
+    primary: "#E89221",
+    notification: "rgb(255, 69, 58)",
+  },
+};
+
 export default function App() {
+  const scheme = useColorScheme();
   const store = configureStore();
 
   const [fontLoaded] = useFonts({
@@ -64,7 +87,7 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <NavigationContainer>
+        <NavigationContainer theme={scheme === "dark" ? DarkTheme : lightTheme}>
           <HomeStackScreen />
           {/* <View style={styles.container}>
           <Text>Open up App.tsx to start working on your app!</Text>

@@ -21,6 +21,7 @@ import ICard from "../../../interfaces/ICard";
 import IDeck from "../../../interfaces/IDeck";
 import HTMLView from "react-native-htmlview";
 import Accordion from "react-native-collapsible/Accordion";
+import { useTheme } from "@react-navigation/native";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -74,28 +75,42 @@ const renderCardSectionList = ({ data: cardList }: any) => {
 
 const CardPreview = (props: any) => {
   const card: ICard = props.card;
+  const { colors } = useTheme();
   return (
-    <View style={styles.cardPreviewContainer}>
+    <View
+      style={[styles.cardPreviewContainer, { backgroundColor: colors.card }]}
+    >
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: "row" }}>
-          <Text style={{ fontFamily: "Nunito", fontSize: 16 }}>
+          <Text
+            style={{ fontFamily: "Nunito", fontSize: 16, color: colors.text }}
+          >
             {card.is_unique ? "⟡ " : ""}
             {card.name}
           </Text>
           {card.type_code === "alter_ego" && (
-            <Text style={{ fontFamily: "Nunito-Regular" }}>
+            <Text style={{ fontFamily: "Nunito-Regular", color: colors.text }}>
               {" "}
               - {card.type_name}
             </Text>
           )}
         </View>
 
-        <Text style={{ fontFamily: "Nunito-BlackItalic", textAlign: "center" }}>
+        <Text
+          style={{
+            fontFamily: "Nunito-BlackItalic",
+            textAlign: "center",
+            color: colors.text,
+          }}
+        >
           {card.traits}
         </Text>
 
         {card.flavor ? (
-          <Text style={{ fontFamily: "Nunito-Italic" }} numberOfLines={2}>
+          <Text
+            style={{ fontFamily: "Nunito-Italic", color: colors.text }}
+            numberOfLines={2}
+          >
             {card.flavor}
           </Text>
         ) : card.text ? (
@@ -105,18 +120,24 @@ const CardPreview = (props: any) => {
             nodeComponentProps={{ numberOfLines: 2 }}
             stylesheet={{
               div: {
+                color: colors.text,
                 fontFamily: "Nunito-Regular",
               },
               b: {
+                color: colors.text,
                 fontFamily: "Nunito-Bold",
               },
               i: {
+                color: colors.text,
                 fontFamily: "Nunito-Italic",
               },
             }}
           />
         ) : (
-          <Text style={{ fontFamily: "Nunito-Regular" }} numberOfLines={2}>
+          <Text
+            style={{ fontFamily: "Nunito-Regular", color: colors.text }}
+            numberOfLines={2}
+          >
             {"Not Available Yet"}
           </Text>
         )}
@@ -140,6 +161,7 @@ const CardPreview = (props: any) => {
 };
 
 const Home = (props: any) => {
+  const { colors } = useTheme();
   useEffect(() => {
     // props.fetchDeckList(new Date().getTime());
     console.log("Running Home useEffect");
@@ -241,6 +263,7 @@ const Home = (props: any) => {
         //Sectioned List with Sticky Header
         <SectionList
           sections={data}
+          showsVerticalScrollIndicator={false}
           // data={cards.cards}
           // initialNumToRender={10}
           // maxToRenderPerBatch={20}
@@ -254,16 +277,24 @@ const Home = (props: any) => {
               <View
                 style={{
                   paddingBottom: 0,
-                  // paddingTop: 8,
-                  backgroundColor: "gray",
+                  paddingTop: 0,
+                  paddingHorizontal: 6,
+                  backgroundColor: colors.primary,
                   flexDirection: "row",
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
+                <Text
+                  style={{
+                    fontFamily: "Raleway",
+                    fontSize: 22,
+                  }}
+                >
                   {`${title}`}
                 </Text>
-                <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
+                <Text
+                  style={{ fontFamily: "Raleway", fontSize: 22, paddingTop: 0 }}
+                >
                   {`${data && data.length} Cards`}
                 </Text>
               </View>
@@ -278,16 +309,17 @@ const Home = (props: any) => {
 const styles = StyleSheet.create({
   cardPreviewContainer: {
     //Fit
-    width: SCREEN.WIDTH,
+    width: SCREEN.WIDTH * 0.96,
     height: 95,
-    marginVertical: 1,
+    marginVertical: 4,
+    marginHorizontal: SCREEN.WIDTH * 0.02,
     padding: 8,
 
     //Positioning
     flexDirection: "row",
 
     //Look
-    // borderRadius: 8,
+    borderRadius: 8,
     backgroundColor: "white",
     shadowColor: "#000",
     shadowOffset: {
