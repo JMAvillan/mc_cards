@@ -9,19 +9,19 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  TextInput,
 } from "react-native";
-import FastImage from "react-native-fast-image";
-import RenderHTML from "react-native-render-html";
 import { connect } from "react-redux";
 import { fetchAllCards, fetchAllCardsReset } from "../../../actions/cards";
 import { fetchDeckList } from "../../../actions/decks";
 import { fetchAllPacks } from "../../../actions/packs";
 import { SCREEN } from "../../../constants";
-import ICard from "../../../interfaces/ICard";
+import { ICard, ILinkedCard } from "../../../interfaces/ICard";
 import IDeck from "../../../interfaces/IDeck";
-import HTMLView from "react-native-htmlview";
 import Accordion from "react-native-collapsible/Accordion";
+import { SheetManager } from "react-native-actions-sheet";
 import { useTheme } from "@react-navigation/native";
+import CardPreview from "./components/CardPreview";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -47,7 +47,7 @@ const DeckPreview = (props: any) => {
 //For SectionList
 const renderCardPreview = ({ item }: any) => {
   const card: ICard = item;
-  const linkedCard = card.linked_card;
+  const linkedCard: ILinkedCard = card.linked_card;
   return (
     <ScrollView
       horizontal
@@ -59,104 +59,6 @@ const renderCardPreview = ({ item }: any) => {
       <CardPreview card={card} />
       {linkedCard && <CardPreview card={linkedCard} />}
     </ScrollView>
-  );
-};
-
-//For Accordion + Flatlist
-const renderCardSectionList = ({ data: cardList }: any) => {
-  return (
-    <FlatList
-      data={cardList}
-      keyExtractor={({ code }) => code}
-      renderItem={renderCardPreview}
-    />
-  );
-};
-
-const CardPreview = (props: any) => {
-  const card: ICard = props.card;
-  const { colors } = useTheme();
-  return (
-    <View
-      style={[styles.cardPreviewContainer, { backgroundColor: colors.card }]}
-    >
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: "row" }}>
-          <Text
-            style={{ fontFamily: "Nunito", fontSize: 16, color: colors.text }}
-          >
-            {card.is_unique ? "⟡ " : ""}
-            {card.name}
-          </Text>
-          {card.type_code === "alter_ego" && (
-            <Text style={{ fontFamily: "Nunito-Regular", color: colors.text }}>
-              {" "}
-              - {card.type_name}
-            </Text>
-          )}
-        </View>
-
-        <Text
-          style={{
-            fontFamily: "Nunito-BlackItalic",
-            textAlign: "center",
-            color: colors.text,
-          }}
-        >
-          {card.traits}
-        </Text>
-
-        {card.flavor ? (
-          <Text
-            style={{ fontFamily: "Nunito-Italic", color: colors.text }}
-            numberOfLines={2}
-          >
-            {card.flavor}
-          </Text>
-        ) : card.text ? (
-          <HTMLView
-            value={`<div>${card.text}</div>`}
-            addLineBreaks={false}
-            nodeComponentProps={{ numberOfLines: 2 }}
-            stylesheet={{
-              div: {
-                color: colors.text,
-                fontFamily: "Nunito-Regular",
-              },
-              b: {
-                color: colors.text,
-                fontFamily: "Nunito-Bold",
-              },
-              i: {
-                color: colors.text,
-                fontFamily: "Nunito-Italic",
-              },
-            }}
-          />
-        ) : (
-          <Text
-            style={{ fontFamily: "Nunito-Regular", color: colors.text }}
-            numberOfLines={2}
-          >
-            {"Not Available Yet"}
-          </Text>
-        )}
-      </View>
-      {/* <Text style={{ textTransform: "capitalize" }}>{card?.meta.aspect}</Text>
-      <Text>Published on: {card?.date_creation}</Text>
-      <Text>Updated on: {card?.date_update}</Text> */}
-      <FastImage
-        style={{ width: "15%", marginLeft: 8 }}
-        source={{
-          uri:
-            `https://marvelcdb.com${card.imagesrc}` ||
-            `https://marvelcdb.com/bundles/cards/${card.code}.png`,
-          headers: { Authorization: "someAuthToken" },
-          priority: FastImage.priority.normal,
-        }}
-        resizeMode={FastImage.resizeMode.contain}
-      />
-    </View>
   );
 };
 
@@ -172,13 +74,16 @@ const Home = (props: any) => {
   props.navigation.setOptions({
     headerRight: () => {
       return (
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.navigate("Filters");
-          }}
-        >
-          <Text>Filter</Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate("Filters");
+              // SheetManager.show("Filters");
+            }}
+          >
+            <Text>Filter Icon</Text>
+          </TouchableOpacity>
+        </>
       );
     },
   });
@@ -186,9 +91,7 @@ const Home = (props: any) => {
   const { decks, cards, packs } = props;
   const [sections, setSections] = useState(null);
   const [data, setData] = useState([]);
-
-  //Used with accordion
-  const [activeSections, setActiveSections] = useState<number[]>([]);
+  const [searchValue, setSearchValue] = useState<string>();
 
   useEffect(() => {
     if (cards.filteredCards) {
@@ -230,36 +133,6 @@ const Home = (props: any) => {
   return (
     <>
       {data.length > 0 && (
-        //Sectioned List With Collapsable sections
-        // <Accordion
-        //   sections={data}
-        //   activeSections={activeSections}
-        //   renderContent={renderCardSectionList}
-        //   renderAsFlatList={true}
-        //   expandMultiple={true}
-        //   renderHeader={(section) => {
-        //     return (
-        //       <View
-        //         style={{
-        //           paddingBottom: 0,
-        //           // paddingTop: 8,
-        //           backgroundColor: "gray",
-        //         }}
-        //       >
-        //         <Text style={{ fontFamily: "Raleway", fontSize: 22 }}>
-        //           {section.title}
-        //         </Text>
-        //       </View>
-        //     );
-        //   }}
-        //   renderSectionTitle={(section) => {
-        //     return <View />;
-        //   }}
-        //   onChange={(indexes) => {
-        //     setActiveSections(indexes);
-        //   }}
-        // />
-
         //Sectioned List with Sticky Header
         <SectionList
           sections={data}
@@ -300,38 +173,16 @@ const Home = (props: any) => {
               </View>
             );
           }}
+          // ListHeaderComponent={() => {
+          //   return <TextInput value={searchValue} />;
+          // }}
         />
       )}
     </>
   );
 };
 
-const styles = StyleSheet.create({
-  cardPreviewContainer: {
-    //Fit
-    width: SCREEN.WIDTH * 0.96,
-    height: 95,
-    marginVertical: 4,
-    marginHorizontal: SCREEN.WIDTH * 0.02,
-    padding: 8,
-
-    //Positioning
-    flexDirection: "row",
-
-    //Look
-    borderRadius: 8,
-    backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
-  },
-});
+const styles = StyleSheet.create({});
 
 const mapStateToProps = (state: any, props: any) => {
   const { decks, cards, packs } = state;

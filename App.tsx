@@ -12,6 +12,10 @@ import {
 import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
+import ActionSheet from "react-native-actions-sheet";
+import Filters from "./src/components/general/filters";
+import { SCREEN } from "./src/constants";
+import FilterHeader from "./src/components/general/filters/FilterHeader";
 
 const lightTheme = {
   dark: false,
@@ -87,7 +91,7 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <NavigationContainer theme={scheme === "dark" ? DarkTheme : lightTheme}>
+        <NavigationContainer theme={scheme === "dark" ? darkTheme : lightTheme}>
           <HomeStackScreen />
           {/* <View style={styles.container}>
           <Text>Open up App.tsx to start working on your app!</Text>
