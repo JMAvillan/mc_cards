@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import Filters from "../general/filters";
+import Filters from "../tabbar/CardLibraryStack/Filter";
 import GameTracker from "../tabbar/GameTrackerStack/GameTracker";
 import TrackNewGame from "../tabbar/GameTrackerStack/TrackNewGame";
 import TrackedGameDetails from "../tabbar/GameTrackerStack/TrackedGameDetails";
@@ -15,6 +15,23 @@ import {
 
 const GameTrackerStack = createStackNavigator<GameTrackerStackParamList>();
 const CardLibraryStack = createStackNavigator<CardLibraryStackParamList>();
+
+const GameTrackerStackScreen = () => {
+  return (
+    <GameTrackerStack.Navigator>
+      <GameTrackerStack.Screen
+        name="GameTracker"
+        component={GameTracker}
+        options={{}}
+      />
+      <GameTrackerStack.Screen
+        name="TrackedGameDetails"
+        component={TrackedGameDetails}
+        options={{}}
+      />
+    </GameTrackerStack.Navigator>
+  );
+};
 
 const CardLibraryStackScreen = () => {
   return (
@@ -34,22 +51,6 @@ const CardLibraryStackScreen = () => {
         }}
       />
     </CardLibraryStack.Navigator>
-  );
-};
-const GameTrackerStackScreen = () => {
-  return (
-    <GameTrackerStack.Navigator>
-      <GameTrackerStack.Screen
-        name="GameTracker"
-        component={GameTracker}
-        options={{}}
-      />
-      <GameTrackerStack.Screen
-        name="TrackedGameDetails"
-        component={TrackedGameDetails}
-        options={{}}
-      />
-    </GameTrackerStack.Navigator>
   );
 };
 

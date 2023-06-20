@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
-import { ICard } from "../../../interfaces/ICard";
+import { ICard } from "../../../../interfaces/ICard";
 import { useTheme } from "@react-navigation/native";
 
 const FilterHeader = (props: any) => {

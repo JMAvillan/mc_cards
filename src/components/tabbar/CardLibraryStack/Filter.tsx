@@ -9,12 +9,17 @@ import { ICard } from "../../../interfaces/ICard";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useTheme } from "@react-navigation/native";
 import Accordion from "react-native-collapsible/Accordion";
-import FilterHeader from "./FilterHeader";
-import FilterOption from "./FilterOption";
+import FilterHeader from "./components/FilterHeader";
+import FilterOption from "./components/FilterOption";
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { CardLibraryNavigationProps } from "../../../interfaces/INavigationProps";
 
-const Filters = (props: any) => {
+const Filters = (props: CardLibraryNavigationProps<"Filters">) => {
   const { colors } = useTheme();
-  // const card = cards[0];
+  const { cards } = useAppSelector(({ cards }) => ({
+    cards,
+  }));
+  const dispatch = useAppDispatch();
 
   props.navigation.setOptions({
     headerTitle: () => <FilterHeader />,
@@ -26,19 +31,20 @@ const Filters = (props: any) => {
       );
     },
   });
+
   const sections = [
-    { title: "Packs", data: Object.values(props.cards.packs), key: "packs" },
+    { title: "Packs", data: Object.values(cards.packs ?? {}), key: "packs" },
     {
       title: "Card Types",
-      data: Object.values(props.cards.types),
+      data: Object.values(cards.types ?? {}),
       key: "types",
     },
     {
       title: "Class",
-      data: Object.values(props.cards.factions),
+      data: Object.values(cards.factions ?? {}),
       key: "factions",
     },
-    { title: "Traits", data: Object.values(props.cards.traits), key: "traits" },
+    { title: "Traits", data: Object.values(cards.traits ?? {}), key: "traits" },
     // { title: "Sets", data: Object.values(props.cards.sets), key: "sets" },
   ];
 
@@ -61,7 +67,7 @@ const Filters = (props: any) => {
             data={data}
             key={key}
             onFilterValueChange={(valueCode: string) => {
-              props.filterCards(key, valueCode);
+              dispatch(filterCards(key, valueCode));
             }}
           />
         );

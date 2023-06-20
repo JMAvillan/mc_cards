@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useTheme } from "@react-navigation/native";
-import { SCREEN } from "../../../constants";
+import { SCREEN } from "../../../../constants";
 
 const FilterOption = ({ data, onFilterValueChange }: any) => {
   const { colors } = useTheme();
