@@ -29,6 +29,7 @@ import Animated, {
   withRepeat,
 } from "react-native-reanimated";
 import { useAppDispatch, useAppSelector } from "../../../store";
+import { CardLibraryNavigationProps } from "../../../interfaces/INavigationProps";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -69,7 +70,7 @@ const renderCardPreview = ({ item }: any) => {
   );
 };
 
-const CardLibrary = (props: any) => {
+const CardLibrary = (props: CardLibraryNavigationProps<"CardLibrary">) => {
   const { colors } = useTheme();
   const { cards, decks, packs } = useAppSelector(({ cards, decks, packs }) => ({
     cards,

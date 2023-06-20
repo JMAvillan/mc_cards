@@ -1,7 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { GameTrackerNavigationProps } from "../../../interfaces/INavigationProps";
 
-const GameTracker = () => {
+const GameTracker = (props: GameTrackerNavigationProps<"GameTracker">) => {
   return (
     <View>
       <Text>GameTracker</Text>

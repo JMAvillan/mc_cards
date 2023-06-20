@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { GameTrackerNavigationProps } from "../../../interfaces/INavigationProps";
 
-const TrackedGameDetails = () => {
+const TrackedGameDetails = (
+  props: GameTrackerNavigationProps<"TrackedGameDetails">
+) => {
   return (
     <View>
       <Text>TrackedGameDetails</Text>
