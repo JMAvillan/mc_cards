@@ -28,6 +28,7 @@ import Animated, {
   withSpring,
   withRepeat,
 } from "react-native-reanimated";
+import { useAppDispatch, useAppSelector } from "../../../store";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -70,10 +71,16 @@ const renderCardPreview = ({ item }: any) => {
 
 const CardLibrary = (props: any) => {
   const { colors } = useTheme();
+  const { cards, decks, packs } = useAppSelector(({ cards, decks, packs }) => ({
+    cards,
+    decks,
+    packs,
+  }));
+  const dispatch = useAppDispatch();
   useEffect(() => {
     // props.fetchDeckList(new Date().getTime());
     console.log("Running Home useEffect");
-    props.fetchAllCards();
+    dispatch(fetchAllCards());
     // props.fetchAllPacks();
   }, []);
 
@@ -94,7 +101,6 @@ const CardLibrary = (props: any) => {
     },
   });
 
-  const { decks, cards, packs } = props;
   const [sections, setSections] = useState(null);
   const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState<string>();
@@ -120,19 +126,19 @@ const CardLibrary = (props: any) => {
     }
   }, [cards.filteredCards]);
 
-  if (props.cards.cardListFetchSuccess && !sections) {
-    console.log("Card Success ->", props.cards.cardListFetchSuccess);
-    props.fetchAllCardsReset();
+  if (cards.cardListFetchSuccess && !sections) {
+    console.log("Card Success ->", cards.cardListFetchSuccess);
+    dispatch(fetchAllCardsReset());
   }
 
-  if (props.cards.cardListFetchFailure) {
+  if (cards.cardListFetchFailure) {
     console.log("Card Failure");
-    props.fetchAllCardsReset();
+    dispatch(fetchAllCardsReset());
   }
-  if (props.packs.packListFetchSuccess) {
+  if (packs.packListFetchSuccess) {
     console.log("Pack Success");
   }
-  if (props.packs.packListFetchFailure) {
+  if (packs.packListFetchFailure) {
     console.log("Pack Failure");
   }
 
@@ -225,23 +231,4 @@ const CardLibrary = (props: any) => {
 
 const styles = StyleSheet.create({});
 
-const mapStateToProps = (state: any, props: any) => {
-  const { decks, cards, packs } = state;
-  return { decks, cards, packs };
-};
-const mapDispatchToProps = (dispatch: any, props: any) => ({
-  fetchDeckList: (startingDate: number) => {
-    dispatch(fetchDeckList(startingDate));
-  },
-  fetchAllCards: () => {
-    dispatch(fetchAllCards());
-  },
-  fetchAllCardsReset: () => {
-    dispatch(fetchAllCardsReset());
-  },
-  fetchAllPacks: () => {
-    dispatch(fetchAllPacks());
-  },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(CardLibrary);
+export default CardLibrary;
