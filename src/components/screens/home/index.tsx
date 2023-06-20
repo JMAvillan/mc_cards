@@ -18,10 +18,16 @@ import { fetchAllPacks } from "../../../actions/packs";
 import { SCREEN } from "../../../constants";
 import { ICard, ILinkedCard } from "../../../interfaces/ICard";
 import IDeck from "../../../interfaces/IDeck";
-import Accordion from "react-native-collapsible/Accordion";
 import { SheetManager } from "react-native-actions-sheet";
 import { useTheme } from "@react-navigation/native";
 import CardPreview from "./components/CardPreview";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withRepeat,
+} from "react-native-reanimated";
 
 const renderDeckPreview = ({ item }: ListRenderItemInfo<any>) => {
   return <DeckPreview deck={item} />;
@@ -94,7 +100,7 @@ const Home = (props: any) => {
   const [searchValue, setSearchValue] = useState<string>();
 
   useEffect(() => {
-    if (cards.filteredCards) {
+    if (cards.filteredCards.length > 0) {
       const sections: any = {};
       cards.filteredCards.forEach((card: ICard) => {
         if (sections[card.type_code]) {
@@ -130,8 +136,43 @@ const Home = (props: any) => {
     console.log("Pack Failure");
   }
 
+  const progress = useSharedValue(1);
+  const scale = useSharedValue(2);
+
+  const reanimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: progress.value,
+      borderRadius: (progress.value * 100) / 2,
+      transform: [
+        { scale: scale.value },
+        // { rotate: `${progress.value * Math.PI}rad` },
+        //Alternative
+        { rotate: handleRotation(progress) },
+      ],
+    };
+  }, []);
+  const handleRotation = (progress: Animated.SharedValue<number>) => {
+    "worklet";
+    return `${progress.value * Math.PI}rad`;
+  };
+  useEffect(() => {
+    progress.value = withRepeat(withSpring(0.5), 10, true);
+    scale.value = withRepeat(withSpring(1), 10, true);
+  }, []);
+
   return (
     <>
+      <Animated.View
+        style={[
+          {
+            height: 100,
+            width: 100,
+            backgroundColor: "blue",
+          },
+          reanimatedStyle,
+        ]}
+      />
+
       {data.length > 0 && (
         //Sectioned List with Sticky Header
         <SectionList

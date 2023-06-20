@@ -1,5 +1,4 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { Text, View } from "react-native";
 import Filters from "../general/filters";
 import Home from "../screens/home";
 
