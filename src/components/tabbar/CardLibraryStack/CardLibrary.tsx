@@ -68,7 +68,7 @@ const renderCardPreview = ({ item }: any) => {
   );
 };
 
-const Home = (props: any) => {
+const CardLibrary = (props: any) => {
   const { colors } = useTheme();
   useEffect(() => {
     // props.fetchDeckList(new Date().getTime());
@@ -244,4 +244,4 @@ const mapDispatchToProps = (dispatch: any, props: any) => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(CardLibrary);

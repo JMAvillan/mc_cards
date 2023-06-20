@@ -1,14 +1,24 @@
 import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import Filters from "../general/filters";
-import Home from "../screens/home";
+import GameTracker from "../tabbar/GameTrackerStack/GameTracker";
+import TrackNewGame from "../tabbar/GameTrackerStack/TrackNewGame";
+import TrackedGameDetails from "../tabbar/GameTrackerStack/TrackedGameDetails";
+import CardLibrary from "../tabbar/CardLibraryStack/CardLibrary";
 
-const HomeStack = createStackNavigator();
+const GameTrackerStack = createStackNavigator();
+const CardLibraryStack = createStackNavigator();
 
-const HomeStackScreen = () => {
+const CardLibraryStackScreen = () => {
   return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen name="Home" component={Home} options={{}} />
-      <HomeStack.Screen
+    <CardLibraryStack.Navigator>
+      <CardLibraryStack.Screen
+        name="Home"
+        component={CardLibrary}
+        options={{}}
+      />
+      <CardLibraryStack.Screen
         name="Filters"
         component={Filters}
         options={{
@@ -17,11 +27,49 @@ const HomeStackScreen = () => {
           cardOverlayEnabled: true,
         }}
       />
-      {/* <HomeStack.Screen name="Notifications" component={Notifications} />
-      <HomeStack.Screen name="Profile" component={Profile} />
-      <HomeStack.Screen name="Settings" component={Settings} /> */}
-    </HomeStack.Navigator>
+    </CardLibraryStack.Navigator>
+  );
+};
+const GameTrackerStackScreen = () => {
+  return (
+    <GameTrackerStack.Navigator>
+      <GameTrackerStack.Screen
+        name="GameTracker"
+        component={GameTracker}
+        options={{}}
+      />
+      <GameTrackerStack.Screen
+        name="TrackedGameDetails"
+        component={TrackedGameDetails}
+        options={{}}
+      />
+    </GameTrackerStack.Navigator>
   );
 };
 
-export { HomeStackScreen };
+const Tab = createBottomTabNavigator();
+
+const Tabs = () => {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="GameTracker" component={GameTrackerStackScreen} />
+      <Tab.Screen name="CardLibrary" component={CardLibraryStackScreen} />
+    </Tab.Navigator>
+  );
+};
+
+const RootStack = createStackNavigator();
+const RootStackScreen = () => {
+  return (
+    <RootStack.Navigator>
+      <RootStack.Screen name="Tab" component={Tabs} options={{}} />
+      <RootStack.Screen
+        name="TrackNewGame"
+        component={TrackNewGame}
+        options={{}}
+      />
+    </RootStack.Navigator>
+  );
+};
+
+export { RootStackScreen };
