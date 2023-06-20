@@ -6,15 +6,21 @@ import GameTracker from "../tabbar/GameTrackerStack/GameTracker";
 import TrackNewGame from "../tabbar/GameTrackerStack/TrackNewGame";
 import TrackedGameDetails from "../tabbar/GameTrackerStack/TrackedGameDetails";
 import CardLibrary from "../tabbar/CardLibraryStack/CardLibrary";
+import {
+  AppRootParamList,
+  AppTabParamList,
+  CardLibraryStackParamList,
+  GameTrackerStackParamList,
+} from "../../interfaces/INavigationProps";
 
-const GameTrackerStack = createStackNavigator();
-const CardLibraryStack = createStackNavigator();
+const GameTrackerStack = createStackNavigator<GameTrackerStackParamList>();
+const CardLibraryStack = createStackNavigator<CardLibraryStackParamList>();
 
 const CardLibraryStackScreen = () => {
   return (
     <CardLibraryStack.Navigator>
       <CardLibraryStack.Screen
-        name="Home"
+        name="CardLibrary"
         component={CardLibrary}
         options={{}}
       />
@@ -47,18 +53,23 @@ const GameTrackerStackScreen = () => {
   );
 };
 
-const Tab = createBottomTabNavigator();
-
+const Tab = createBottomTabNavigator<AppTabParamList>();
 const Tabs = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="GameTracker" component={GameTrackerStackScreen} />
-      <Tab.Screen name="CardLibrary" component={CardLibraryStackScreen} />
+      <Tab.Screen
+        name="GameTrackerStackScreen"
+        component={GameTrackerStackScreen}
+      />
+      <Tab.Screen
+        name="CardLibraryStackScreen"
+        component={CardLibraryStackScreen}
+      />
     </Tab.Navigator>
   );
 };
 
-const RootStack = createStackNavigator();
+const RootStack = createStackNavigator<AppRootParamList>();
 const RootStackScreen = () => {
   return (
     <RootStack.Navigator>

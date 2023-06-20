@@ -5,13 +5,15 @@ import {
 } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 
-//Stack/Tab Param Lists
+// Stack/Tab Param Lists
 export type GameTrackerStackParamList = {
   GameTracker: undefined;
   TrackedGameDetails: undefined;
 };
+
 export type CardLibraryStackParamList = {
   CardLibrary: undefined;
+  Filters: undefined;
 };
 
 export type AppTabParamList = {
@@ -25,7 +27,6 @@ export type AppRootParamList = {
 };
 
 // Navigation Props
-
 export type RootNavigationProps<T extends keyof AppRootParamList> =
   StackScreenProps<AppRootParamList, T>;
 
@@ -49,6 +50,7 @@ export type CardLibraryNavigationProps<
   >
 >;
 
+// Set globally for useNavigation usage
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends AppRootParamList {}
