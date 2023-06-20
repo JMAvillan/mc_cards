@@ -1,16 +1,16 @@
 import { CARDS } from "../constants";
-import ICardList from "../interfaces/ICardList";
-import ICard from "../interfaces/ICard";
+import ICardList, { IFilteredOptions } from "../interfaces/ICardList";
+import { ICard } from "../interfaces/ICard";
 
 const defaultState: ICardList = {
-  cards: null,
+  cards: [],
   factions: null,
   traits: null,
   types: null,
   packs: null,
   sets: null,
 
-  filteredCards: null,
+  filteredCards: [],
 
   error: null,
 
@@ -24,11 +24,11 @@ const cardListReducer = (
 ) => {
   switch (action.type) {
     case CARDS.REQUEST_ALL_CARDS_SUCCESS: {
-      const factions: any = {};
-      const traits: any = {};
-      const types: any = {};
-      const packs: any = {};
-      const sets: any = {};
+      const factions: ICardList["factions"] = {};
+      const traits: ICardList["traits"] = {};
+      const types: ICardList["types"] = {};
+      const packs: ICardList["packs"] = {};
+      const sets: ICardList["sets"] = {};
       const cards: ICard[] = action.payload.cards;
       for (let i = 0; i < cards.length; i++) {
         if (cards[i]?.pack_code)
@@ -104,53 +104,29 @@ const cardListReducer = (
       };
     }
     case CARDS.FILTER_CARDS: {
-      const filterCode: string = action.payload.filterCode;
-      const valueCode: string = action.payload.valueCode;
+      const filterCode: keyof Pick<
+        ICardList,
+        "factions" | "traits" | "types" | "packs" | "sets"
+      > = action.payload.filterCode;
+      const valueCode: any = action.payload.valueCode;
 
-      console.log("inside reducer -> changed filter ->", filterCode, valueCode);
-      state[filterCode][valueCode].selected =
-        !state[filterCode][valueCode].selected;
+      //
+      state[filterCode]![valueCode].selected =
+        !state[filterCode]![valueCode].selected;
 
-      type filter = { name: string; code: string; selected: boolean };
-
-      const activePacks = {
-        fieldName: "pack_code",
-        data: Object.values<filter>(state.packs ? state.packs : {}).filter(
-          (filterOption) => {
-            return filterOption.selected;
-          }
-        ),
-      };
-      const activeFactions = {
-        fieldName: "faction_code",
-        data: Object.values<filter>(
-          state.factions ? state.factions : {}
-        ).filter((filterOption) => {
+      const getFilterData = (
+        fieldName: keyof ICard,
+        data: typeof state.factions
+      ) => ({
+        fieldName,
+        data: Object.values(data ?? {}).filter((filterOption) => {
           return filterOption.selected;
         }),
-      };
-      const activeTypes = {
-        fieldName: "type_code",
-        data: Object.values<filter>(state.types ? state.types : {}).filter(
-          (filterOption) => {
-            return filterOption.selected;
-          }
-        ),
-      };
-      const activeSets = {
-        fieldName: "card_set_code",
-        data: Object.values<filter>(state.sets ? state.sets : {}).filter(
-          (filterOption) => {
-            return filterOption.selected;
-          }
-        ),
-      };
-
-      const traits: any = {};
+      });
 
       const validateFilters = (
         card: ICard,
-        activeFilter: { fieldName: string; data: filter[] }
+        activeFilter: { fieldName: keyof ICard; data: IFilteredOptions[] }
       ) => {
         if (activeFilter.data.length > 0) {
           if (
@@ -163,6 +139,15 @@ const cardListReducer = (
         }
         return true;
       };
+
+      const activeSets = getFilterData("card_set_code", state.sets);
+      const activePacks = getFilterData("pack_code", state.packs);
+      const activeFactions = getFilterData("faction_code", state.factions);
+      const activeTypes = getFilterData("type_code", state.types);
+
+      //TODO
+      //Trait filtering/searching
+      const traits: any = {};
 
       const filteredCards = state.cards?.filter((card: any) => {
         if (!validateFilters(card, activeSets)) return false;

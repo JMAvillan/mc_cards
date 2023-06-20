@@ -1,7 +1,7 @@
 import IPack from "./IPack";
 
 export default interface IPackList {
-  packs: [IPack];
+  packs: IPack[];
   error: null;
 
   packListFetchSuccess: boolean;

@@ -1,7 +1,7 @@
 import IDeck from "./IDeck";
 
 export default interface IDeckList {
-  decks: [IDeck];
+  decks: IDeck[];
   error: null;
 
   deckListFetchSuccess: boolean;
