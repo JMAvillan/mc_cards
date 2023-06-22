@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import Collapsible from "react-native-collapsible";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
-import { connect } from "react-redux";
 import { filterCards } from "../../../actions/cards";
-import { SCREEN } from "../../../constants";
-import { ICard } from "../../../interfaces/ICard";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useTheme } from "@react-navigation/native";
 import Accordion from "react-native-collapsible/Accordion";
 import FilterHeader from "./components/FilterHeader";
@@ -108,14 +102,4 @@ const Filters = (props: CardLibraryNavigationProps<"Filters">) => {
   );
 };
 
-const mapStateToProps = (state: any, props: any) => {
-  const { decks, cards, packs } = state;
-  return { decks, cards, packs };
-};
-const mapDispatchToProps = (dispatch: any, props: any) => ({
-  filterCards: (filterCode: string, valueCode: string) => {
-    dispatch(filterCards(filterCode, valueCode));
-  },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Filters);
+export default Filters;
