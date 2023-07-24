@@ -52,6 +52,11 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+###################################################
+# TODO - Remove drawable and raw folders from git #
+###################################################
+res/drawable*
+res/raw
 
 # node.js
 #
